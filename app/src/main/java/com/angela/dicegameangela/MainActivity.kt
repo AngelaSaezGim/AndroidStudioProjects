@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.angela.dicegameangela.ui.theme.DiceGameAngelaTheme
@@ -61,7 +62,7 @@ fun Content(modifier: Modifier = Modifier) {
 
     //tiradas (la ultima (comparar) y la actual)
     var diceThrowed by rememberSaveable { mutableIntStateOf(0) }
-    var lastDiceThrow by rememberSaveable { mutableIntStateOf(0) }
+    var nextdiceThrowed by rememberSaveable { mutableIntStateOf(0) }
 
     //Mensaje que se cambiará para simular lanzamiento de dado
     var messageDiceThrowing by rememberSaveable { mutableStateOf("Lanzando dado...") }
@@ -71,37 +72,18 @@ fun Content(modifier: Modifier = Modifier) {
     var showPopup by rememberSaveable { mutableStateOf(false) }
     var popupMessage by rememberSaveable { mutableStateOf("") }
 
-    //Colores
-    val colorButtons = 0xFF6FD0B0
-    val colorButtons2 = 0xFF348067
-
-    //Colores botones desactivados
-    val colorButtonsDisabled = 0xFFB6E7E0
-
-    // *Colores gradiantes para un fondo bonito
+    //Colores (xml)
+    val colorButtons = colorResource(id = R.color.color_buttons)
+    val colorButtons2 = colorResource(id = R.color.color_buttons2)
+    val colorButtonsDisabled = colorResource(id = R.color.color_buttons_disabled)
     val gradientColors = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFFE0F7FA),
-            Color(0xFFB2EBF2)
+            colorResource(id = R.color.gradient_start), colorResource(id = R.color.gradient_end)
         )
     )
 
     //OBJETO DADO
     val dice = Dice() // 6 caras por defecto
-
-    //funcion lanzar dado
-    fun throwDice() {
-        Thread {
-            buttonsEnabled = false
-            lastDiceThrow = diceThrowed //almacena la tirada anterior
-            // Muestra "Lanzando dado..."
-                messageDiceThrowing = "Lanzando dado..."
-                Thread.sleep(2000L)  // 2 segundos
-                diceThrowed = dice.throwDice() // método de la clase Dice
-                messageDiceThrowing = "¡Salió $diceThrowed!"
-            buttonsEnabled = true
-        }.start()
-    }
 
     Column(
         modifier = Modifier
@@ -118,9 +100,7 @@ fun Content(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Absolute.Center
         ) {
             Text(
-                text = "Dice Game",
-                fontSize = 30.sp,
-                color = Color.Black
+                text = "Dice Game", fontSize = 30.sp, color = Color.Black
             )
         } //FIN FILA TITULO JUEGO
 
@@ -130,15 +110,15 @@ fun Content(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp)
-                .border(1.dp,Color.Black).padding(10.dp),
-            horizontalArrangement = Arrangement.Absolute.Center
+                .border(1.dp, Color.Black)
+                .padding(10.dp), horizontalArrangement = Arrangement.Absolute.Center
         ) {
             Text(
                 text = "Deberás predecir el numero aleatorio que va a salir. Ya sea directamente (1-6) o guiandote por el número que salió en el dado (↑ o ↓) .",
             )
         } //FIN FILA DESCRIPCIÓN
 
-        if(startGame) {
+        if (startGame) {
             //COLUMNA = [JUEGO]
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -146,14 +126,15 @@ fun Content(modifier: Modifier = Modifier) {
                 //FILA PUNTOS
                 Row(
                     //organizacion horizontal
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
                     horizontalArrangement = Arrangement.End,
                 ) {
                     if (dicePoints == 0) {
                         //Uso box para poder centrarlo cuando salga GAME OVER, ya que ocupa todo el ancho de la fila
                         Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
+                            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                         ) {
                             Button(
                                 onClick = {
@@ -177,48 +158,35 @@ fun Content(modifier: Modifier = Modifier) {
                                 )
                             }
                         }
-                    }else {
-                        Spacer(modifier = Modifier.width(20.dp))
-                        Box(
-                            modifier = Modifier
-                                .border(1.dp, Color.Black)
-                                .shadow(1.dp)
-                                .padding(10.dp)
-                                .width(100.dp)
-                                .height(30.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Anterior: $lastDiceThrow",
-                                fontSize = 20.sp,
-                                color = Color(0xFF0E976A)
-                            )
-                        }
                     }
+
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(10.dp) ,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
                         horizontalAlignment = Alignment.End,
-                    ){
-                        if(dicePoints>0){
-                        Box(
-                            modifier = Modifier.border(1.dp, Color.Black).padding(10.dp)
-                        ) {
-                            Text(
-                                text = "$dicePoints pts",
-                                fontSize = 20.sp,
-                                color = Color(0xFF0E976A)
-                            )
-                        }
+                    ) {
+                        if (dicePoints > 0) {
+                            Box(
+                                modifier = Modifier
+                                    .border(1.dp, Color.Black)
+                                    .padding(10.dp)
+                            ) {
+                                Text(
+                                    text = "$dicePoints pts",
+                                    fontSize = 20.sp,
+                                    color = Color(0xFF0E976A)
+                                )
+                            }
                         }
                     }
                 } //FIN FILA PUNTOS
             }
             //FILA DADO
-            if(dicePoints>0) {
+            if (dicePoints > 0) {
                 Row(
                     //organizacion horizontal
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = messageDiceThrowing,
@@ -228,10 +196,12 @@ fun Content(modifier: Modifier = Modifier) {
             }
             Row(
                 //organizacion horizontal
-                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(dicePoints<=0){
+                if (dicePoints <= 0) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -249,22 +219,21 @@ fun Content(modifier: Modifier = Modifier) {
                             color = Color.Red
                         )
                     }
-                }else{
-                    // Contenedor para centrar el box de diceThrowed y lastDiceThrow en la misma fila
-                        Box(
-                            modifier = Modifier
-                                .border(2.dp, Color.Black)
-                                .shadow(2.dp)
-                                .padding(40.dp)
-                                .width(120.dp)
-                                .height(80.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "$diceThrowed",
-                                fontSize = 30.sp,
-                            )
-                        }
+                } else {
+                    // Contenedor para centrar el box de diceThrowed
+                    Box(
+                        modifier = Modifier
+                            .border(2.dp, Color.Black)
+                            .shadow(2.dp)
+                            .padding(40.dp)
+                            .width(120.dp)
+                            .height(80.dp), contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "$diceThrowed",
+                            fontSize = 30.sp,
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -272,7 +241,9 @@ fun Content(modifier: Modifier = Modifier) {
             //FILA - BOTONES NUMEROS DEL 1 AL 6
             Row(
                 //organizacion horizontal
-                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
                 horizontalArrangement = Arrangement.Absolute.Center
             ) {
                 //He hecho bucles para las 2 filas para ahorrar codigo
@@ -280,24 +251,40 @@ fun Content(modifier: Modifier = Modifier) {
                     Button(
                         onClick = {
                             dicePoints -= 3
-                            if (dicePoints < 0) dicePoints = 0
-                            if (diceThrowed == i) {
-                                dicePoints += 15
-                                popupMessage = "¡Has adivinado el número! Ganas 15 puntos."
-                            } else {
-                                popupMessage = "No lo adivinaste, pierdes 3 puntos."
-                            }
-                            showPopup = true
-                            throwDice()
+                            buttonsEnabled = false
+                            messageDiceThrowing = "Lanzando dado..."
+                            Thread {
+                                Thread.sleep(1000L)
+                                nextdiceThrowed = dice.throwDice() //Se tira dado
+                                messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                                if (dicePoints <= 0) {
+                                    dicePoints = 0
+                                    popupMessage = "Has gastado todos los puntos, has perdido"
+                                    showPopup = true
+                                } else {
+                                    //Se compara
+                                    if (nextdiceThrowed == i) {
+                                        dicePoints += 15
+                                        popupMessage =
+                                            "¡Has adivinado el número! Ganaste 15 puntos."
+                                    } else {
+                                        popupMessage = "No lo adivinaste, perdiste 3 puntos."
+                                    }
+                                    showPopup = true
+                                }
+                                buttonsEnabled = true
+                                diceThrowed = nextdiceThrowed //Lo vemos
+                            }.start()
                         },
                         enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(colorButtons),
+                            containerColor = colorButtons,
                             contentColor = Color.White,
-                            disabledContainerColor = Color(colorButtonsDisabled),
+                            disabledContainerColor = colorButtonsDisabled,
                         ),
                         shape = CircleShape,
-                        modifier = Modifier.shadow(4.dp, CircleShape)
+                        modifier = Modifier
+                            .shadow(4.dp, CircleShape)
                             .border(1.dp, Color.White, CircleShape)
                     ) {
                         Text(text = "$i", fontSize = 20.sp, modifier = Modifier.padding(2.dp))
@@ -305,7 +292,7 @@ fun Content(modifier: Modifier = Modifier) {
                     Spacer(modifier = Modifier.width(5.dp))
                 }
             }
-             //FIN FILA
+            //FIN FILA
             Row(
                 //organizacion horizontal
                 modifier = Modifier.fillMaxWidth(),
@@ -315,23 +302,40 @@ fun Content(modifier: Modifier = Modifier) {
                     Button(
                         onClick = {
                             dicePoints -= 3
-                            if (dicePoints < 0) dicePoints = 0
-                            if (diceThrowed == i) {
-                                dicePoints += 15
-                                popupMessage = "¡Has adivinado el número! Ganaste 15 puntos."
-                            } else {
-                                popupMessage = "No lo adivinaste, perdiste 3 puntos."
-                            }
-                            showPopup = true
-                            throwDice()
+                            buttonsEnabled = false
+                            messageDiceThrowing = "Lanzando dado..."
+                            Thread {
+                                Thread.sleep(1000L)
+                                nextdiceThrowed = dice.throwDice() //Se tira dado
+                                messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                                if (dicePoints <= 0) {
+                                    dicePoints = 0
+                                    popupMessage = "Has gastado todos los puntos, has perdido"
+                                    showPopup = true
+                                } else {
+                                    //Se compara
+                                    if (nextdiceThrowed == i) {
+                                        dicePoints += 15
+                                        popupMessage =
+                                            "¡Has adivinado el número! Ganaste 15 puntos."
+                                    } else {
+                                        popupMessage = "No lo adivinaste, perdiste 3 puntos."
+                                    }
+                                    showPopup = true
+                                }
+                                buttonsEnabled = true
+                                diceThrowed = nextdiceThrowed //Lo vemos
+                            }.start()
                         },
                         enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(colorButtons),
+                            containerColor = colorButtons,
                             contentColor = Color.White,
-                            disabledContainerColor = Color(colorButtonsDisabled)),
+                            disabledContainerColor = colorButtonsDisabled
+                        ),
                         shape = CircleShape,
-                        modifier = Modifier.shadow(4.dp, CircleShape)
+                        modifier = Modifier
+                            .shadow(4.dp, CircleShape)
                             .border(1.dp, Color.White, CircleShape)
                     ) {
                         Text(text = "$i", fontSize = 20.sp, modifier = Modifier.padding(2.dp))
@@ -344,7 +348,9 @@ fun Content(modifier: Modifier = Modifier) {
             //FILA - BOTONES MAYOR Y MENOR
             Row(
                 //organizacion horizontal
-                modifier = Modifier.fillMaxWidth().padding(15.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
                 horizontalArrangement = Arrangement.Absolute.Center
             ) {
                 Text(
@@ -353,29 +359,47 @@ fun Content(modifier: Modifier = Modifier) {
             } //FIN FILA
             Row(
                 //organizacion horizontal
-                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
                 horizontalArrangement = Arrangement.Absolute.Center
             ) {
                 Button(
                     onClick = {
                         dicePoints -= 1
-                        if (diceThrowed > lastDiceThrow) {
-                            dicePoints += 3
-                            popupMessage = "¡Correcto! Has ganado 3 puntos."
-                        } else {
-                            popupMessage = "Incorrecto, has perdido 1 punto."
-                        }
-                        lastDiceThrow = diceThrowed
-                        showPopup = true
+                        buttonsEnabled = false
+                        messageDiceThrowing = "Lanzando dado..."
+                        Thread {
+                            Thread.sleep(1000L)
+                            nextdiceThrowed = dice.throwDice() //Se tira dado
+                            messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                            if (dicePoints <= 0) {
+                                dicePoints = 0
+                                popupMessage = "Has gastado todos los puntos, has perdido"
+                                showPopup = true
+                            } else {
+                                //Se compara
+                                if (nextdiceThrowed > diceThrowed) {
+                                    dicePoints += 3
+                                    popupMessage = "¡Correcto! Has ganado 3 puntos."
+                                } else {
+                                    popupMessage = "Incorrecto, has perdido 1 punto."
+                                }
+                                showPopup = true
+                            }
+                            buttonsEnabled = true
+                            diceThrowed = nextdiceThrowed //Lo vemos
+                        }.start()
                     },
                     enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(colorButtons2),
+                        containerColor = colorButtons2,
                         contentColor = Color.White,
-                        disabledContainerColor = Color(colorButtonsDisabled)
+                        disabledContainerColor = colorButtonsDisabled
                     ),
                     shape = CircleShape,
-                    modifier = Modifier.shadow(8.dp, CircleShape)
+                    modifier = Modifier
+                        .shadow(8.dp, CircleShape)
                         .border(1.dp, Color.White, CircleShape)
                 ) {
                     Text(
@@ -386,24 +410,39 @@ fun Content(modifier: Modifier = Modifier) {
                 Button(
                     onClick = {
                         dicePoints -= 1
-                        if (dicePoints < 0) dicePoints = 0
-                        if (diceThrowed < lastDiceThrow) {
-                            dicePoints += 3
-                            popupMessage = "¡Correcto! Has ganado 3 puntos."
-                        } else {
-                            popupMessage = "Incorrecto, has perdido 1 punto."
-                        }
-                        lastDiceThrow = diceThrowed
-                        showPopup = true
+                        buttonsEnabled = false
+                        messageDiceThrowing = "Lanzando dado..."
+                        Thread {
+                            Thread.sleep(1000L)
+                            nextdiceThrowed = dice.throwDice() //Se tira dado
+                            messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                            if (dicePoints <= 0) {
+                                dicePoints = 0
+                                popupMessage = "Has gastado todos los puntos, has perdido"
+                                showPopup = true
+                            }else{
+                                //Se compara
+                                if (nextdiceThrowed < diceThrowed) {
+                                    dicePoints += 3
+                                    popupMessage = "¡Correcto! Has ganado 3 puntos."
+                                } else {
+                                    popupMessage = "Incorrecto, has perdido 1 punto."
+                                }
+                                showPopup = true
+                            }
+                            buttonsEnabled = true
+                            diceThrowed = nextdiceThrowed //Lo vemos
+                        }.start()
                     },
                     enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(colorButtons2),
+                        containerColor = colorButtons2,
                         contentColor = Color.White,
-                        disabledContainerColor = Color(colorButtonsDisabled)
+                        disabledContainerColor = colorButtonsDisabled
                     ),
                     shape = CircleShape,
-                    modifier = Modifier.shadow(8.dp, CircleShape)
+                    modifier = Modifier
+                        .shadow(8.dp, CircleShape)
                         .border(1.dp, Color.White, CircleShape)
                 ) {
                     Text(
@@ -429,24 +468,35 @@ fun Content(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 //organizacion horizontal
-                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
                     onClick = {
                         startGame = true
-                        throwDice()
+
+                        //LANZAMIENTO INICIAL DEL DADO
+                        buttonsEnabled = false
+                        messageDiceThrowing = "Lanzando dado..."
+                        Thread {
+                            Thread.sleep(1000L)  // 1 segundo
+                            diceThrowed = dice.throwDice() // método de la clase Dice
+                            messageDiceThrowing = "¡Salió $diceThrowed!"
+                            buttonsEnabled = true
+                        }.start()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(colorButtons2), contentColor = Color.White
+                        containerColor = colorButtons2, contentColor = Color.White
                     ),
                     shape = CircleShape,
-                    modifier = Modifier.shadow(8.dp, CircleShape)
+                    modifier = Modifier
+                        .shadow(8.dp, CircleShape)
                         .border(1.dp, Color.White, CircleShape)
                 ) {
                     Text(
-                        text = "COMENZAR JUEGO", fontSize = 20.sp,
-                        modifier = Modifier.padding(2.dp)
+                        text = "COMENZAR JUEGO", fontSize = 20.sp, modifier = Modifier.padding(2.dp)
                     )
                 }
             }
@@ -468,14 +518,12 @@ fun Content(modifier: Modifier = Modifier) {
 
         //Configuración pop-up
         if (showPopup) {
-            AlertDialog(
-                onDismissRequest = { showPopup = false }, // Ocultar el pop-up al cerrarlo
-                title = { Text(text = "Resultado") },
-                text = { Text(text = popupMessage) },
-                confirmButton = {
-                    Button(onClick = { showPopup = false }) { Text("OK") }
-                }
-            )
+            AlertDialog(onDismissRequest = { showPopup = false }, // Ocultar el pop-up al cerrarlo
+                        title = { Text(text = "Resultado Dado") },
+                        text = { Text(text = popupMessage) },
+                        confirmButton = {
+                            Button(onClick = { showPopup = false }) { Text("OK") }
+                        })
         }
     }
 }
