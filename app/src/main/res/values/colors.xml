@@ -3,7 +3,7 @@
     <!-- Colores de botones activos -->
     <color name="color_buttons">#6FD0B0</color>
     <color name="color_buttons2">#348067</color>
-    <color name="button_restart_background">#4F7367</color>
+    <color name="button_restartstart_background">#4F7367</color>
 
     <!-- Color de botones desactivados -->
     <color name="color_buttons_disabled">#B6E7E0</color>
@@ -16,6 +16,7 @@
 
     <!-- Color letras-->
     <color name="default_text">#000000</color>
+    <color name="default_text2">#FFFFFF</color>
 
     <!-- Colores del fondo degradado -->
     <color name="gradient_start">#E0F7FA</color>

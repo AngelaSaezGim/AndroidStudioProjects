@@ -75,7 +75,11 @@ fun Content(modifier: Modifier = Modifier) {
     //Colores (xml)
     val colorButtons = colorResource(id = R.color.color_buttons)
     val colorButtons2 = colorResource(id = R.color.color_buttons2)
+
     val colorButtonsDisabled = colorResource(id = R.color.color_buttons_disabled)
+    val colorTxt1 = colorResource(id = R.color.default_text) //Negro
+    val colorTxt2 = colorResource(id = R.color.default_text2) //Blanco
+
     val gradientColors = Brush.verticalGradient(
         colors = listOf(
             colorResource(id = R.color.gradient_start), colorResource(id = R.color.gradient_end)
@@ -100,18 +104,20 @@ fun Content(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Absolute.Center
         ) {
             Text(
-                text = "Dice Game", fontSize = 30.sp, color = Color.Black
+                text = "Dice Game",
+                fontSize = 30.sp,
+                color = colorTxt1
             )
-        } //FIN FILA TITULO JUEGO
-
+        }
+        //FIN FILA TITULO JUEGO
         //FILA DESCRIPCIÓN
         Row(
-            //organizacion horizontal
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp)
                 .border(1.dp, Color.Black)
-                .padding(10.dp), horizontalArrangement = Arrangement.Absolute.Center
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.Absolute.Center
         ) {
             Text(
                 text = "Deberás predecir el numero aleatorio que va a salir. Ya sea directamente (1-6) o guiandote por el número que salió en el dado (↑ o ↓) .",
@@ -144,7 +150,8 @@ fun Content(modifier: Modifier = Modifier) {
                                     dice.reset() // uso objeto dice para resetear dado
                                 },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF4F7367), contentColor = Color.White
+                                    containerColor = colorResource(id = R.color.button_restartstart_background),
+                                    contentColor = colorTxt2
                                 ),
                                 shape = CircleShape,
                                 modifier = Modifier
@@ -175,7 +182,7 @@ fun Content(modifier: Modifier = Modifier) {
                                 Text(
                                     text = "$dicePoints pts",
                                     fontSize = 20.sp,
-                                    color = Color(0xFF0E976A)
+                                    color = colorResource(id = R.color.points_text)
                                 )
                             }
                         }
@@ -216,7 +223,7 @@ fun Content(modifier: Modifier = Modifier) {
                             text = "GAME OVER",
                             fontSize = 20.sp,
                             modifier = Modifier.align(Alignment.Center),
-                            color = Color.Red
+                            color = colorResource(id = R.color.game_over_text)
                         )
                     }
                 } else {
@@ -279,7 +286,7 @@ fun Content(modifier: Modifier = Modifier) {
                         enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                         colors = ButtonDefaults.buttonColors(
                             containerColor = colorButtons,
-                            contentColor = Color.White,
+                            contentColor = colorTxt2,
                             disabledContainerColor = colorButtonsDisabled,
                         ),
                         shape = CircleShape,
@@ -330,7 +337,7 @@ fun Content(modifier: Modifier = Modifier) {
                         enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                         colors = ButtonDefaults.buttonColors(
                             containerColor = colorButtons,
-                            contentColor = Color.White,
+                            contentColor = colorTxt2,
                             disabledContainerColor = colorButtonsDisabled
                         ),
                         shape = CircleShape,
@@ -394,7 +401,7 @@ fun Content(modifier: Modifier = Modifier) {
                     enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorButtons2,
-                        contentColor = Color.White,
+                        contentColor = colorTxt2,
                         disabledContainerColor = colorButtonsDisabled
                     ),
                     shape = CircleShape,
@@ -437,7 +444,7 @@ fun Content(modifier: Modifier = Modifier) {
                     enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorButtons2,
-                        contentColor = Color.White,
+                        contentColor = colorTxt2,
                         disabledContainerColor = colorButtonsDisabled
                     ),
                     shape = CircleShape,
@@ -488,7 +495,8 @@ fun Content(modifier: Modifier = Modifier) {
                         }.start()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colorButtons2, contentColor = Color.White
+                        containerColor = colorButtons2,
+                        contentColor = colorTxt2
                     ),
                     shape = CircleShape,
                     modifier = Modifier
