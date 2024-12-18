@@ -200,15 +200,6 @@ fun Content(modifier: Modifier = Modifier) {
                 } //FIN FILA PUNTOS
             }
             //FILA DADO
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ){
-                Text(
-                    text= "Aqui irán los mensajes del dado (si ganas puntos/pierdes)..",
-                    fontSize = 12.sp,
-                )
-            }
             if (dicePoints > 0) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -224,7 +215,7 @@ fun Content(modifier: Modifier = Modifier) {
                 //organizacion horizontal
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(10.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 if (dicePoints <= 0) {
@@ -258,6 +249,16 @@ fun Content(modifier: Modifier = Modifier) {
                         )
                     }
                 }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Text(
+                    text= "Aqui irán los mensajes del dado.",
+                    fontSize = dimensionResource(id = R.dimen.fontsize_small).value.sp,
+                )
             }
             Spacer(modifier = Modifier.height(10.dp))
 
