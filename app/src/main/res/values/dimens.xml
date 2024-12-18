@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Font sizes de mi archivo -->
+    <dimen name="fontsize_small">15sp</dimen>
+    <dimen name="fontsize_medium">25sp</dimen>
+    <dimen name="fontsize_big">30sp</dimen>
+</resources>

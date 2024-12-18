@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="description_game">You must predict the random number that will appear. Either directly (1–6) or by following the number shown on the dice (↑ or ↓).</string>
+    <string name="reset_game">RESET GAME</string>
+    <string name="throwing_message">Rolling dice…</string>
+    <string name="game_over">GAME OVER</string>
+    <string name="no_points_message">You have used up all your points, you lost.</string>
+    <string name="win_guess_message">You guessed the number! You earned 15 points.</string>
+    <string name="lost_guess_message">You didn\'t guess it, you lost 3 points.</string>
+    <string name="win_compare_message">Correct! You earned 3 points.</string>
+    <string name="lost_compare_message">Incorrect, you lost 1 point.</string>
+    <string name="explication_compare">Will the next number be higher or lower than %1$s?</string>
+    <string name="major">Higher</string>
+    <string name="minor">Lower</string>
+    <string name="start_game">START GAME</string>
+</resources>

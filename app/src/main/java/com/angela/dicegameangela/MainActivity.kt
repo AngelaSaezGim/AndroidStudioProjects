@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +33,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.angela.dicegameangela.ui.theme.DiceGameAngelaTheme
@@ -64,8 +66,16 @@ fun Content(modifier: Modifier = Modifier) {
     var diceThrowed by rememberSaveable { mutableIntStateOf(0) }
     var nextdiceThrowed by rememberSaveable { mutableIntStateOf(0) }
 
+
     //Mensaje que se cambiará para simular lanzamiento de dado
-    var messageDiceThrowing by rememberSaveable { mutableStateOf("Lanzando dado...") }
+    val messageStr1 = stringResource(R.string.throwing_message)
+    var messageDiceThrowing by rememberSaveable {mutableStateOf(messageStr1) }
+    val noPointsMessage = stringResource(R.string.no_points_message)
+    val winGuessMessage = stringResource(R.string.win_guess_message)
+    val lostGuessMessage = stringResource(R.string.lost_guess_message)
+    val winCompareMessage = stringResource(R.string.win_compare_message)
+    val lostCompareMessage = stringResource(R.string.lost_compare_message)
+
     var buttonsEnabled by rememberSaveable { mutableStateOf(true) } //para la espera del lanzamiento
 
     // Pop-ups para informar al jugador si pierde o gana puntos
@@ -95,7 +105,7 @@ fun Content(modifier: Modifier = Modifier) {
             .background(gradientColors)
             .then(modifier),
     ) {
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         //FILA - TITULO JUEGO
         Row(
             modifier = Modifier
@@ -104,8 +114,8 @@ fun Content(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Absolute.Center
         ) {
             Text(
-                text = "Dice Game",
-                fontSize = 30.sp,
+                text = stringResource(R.string.tittle_game),
+                fontSize =  dimensionResource(id = R.dimen.fontsize_big).value.sp,
                 color = colorTxt1
             )
         }
@@ -114,13 +124,14 @@ fun Content(modifier: Modifier = Modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(10.dp)
                 .border(1.dp, Color.Black)
-                .padding(10.dp),
+                .padding(8.dp),
             horizontalArrangement = Arrangement.Absolute.Center
         ) {
             Text(
-                text = "Deberás predecir el numero aleatorio que va a salir. Ya sea directamente (1-6) o guiandote por el número que salió en el dado (↑ o ↓) .",
+                text = stringResource(R.string.description_game),
+                fontSize = 15.sp
             )
         } //FIN FILA DESCRIPCIÓN
 
@@ -138,9 +149,9 @@ fun Content(modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.End,
                 ) {
                     if (dicePoints == 0) {
-                        //Uso box para poder centrarlo cuando salga GAME OVER, ya que ocupa todo el ancho de la fila
-                        Box(
-                            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Button(
                                 onClick = {
@@ -159,14 +170,13 @@ fun Content(modifier: Modifier = Modifier) {
                                     .shadow(2.dp, CircleShape)
                             ) {
                                 Text(
-                                    text = "VOLVER A EMPEZAR",
-                                    fontSize = 25.sp,
+                                    text = stringResource(R.string.reset_game),
+                                    fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
                                     modifier = Modifier.padding(5.dp),
                                 )
                             }
                         }
                     }
-
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -174,14 +184,14 @@ fun Content(modifier: Modifier = Modifier) {
                         horizontalAlignment = Alignment.End,
                     ) {
                         if (dicePoints > 0) {
-                            Box(
+                            Row(
                                 modifier = Modifier
                                     .border(1.dp, Color.Black)
                                     .padding(10.dp)
                             ) {
                                 Text(
                                     text = "$dicePoints pts",
-                                    fontSize = 20.sp,
+                                    fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
                                     color = colorResource(id = R.color.points_text)
                                 )
                             }
@@ -190,10 +200,19 @@ fun Content(modifier: Modifier = Modifier) {
                 } //FIN FILA PUNTOS
             }
             //FILA DADO
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Text(
+                    text= "Aqui irán los mensajes del dado (si ganas puntos/pierdes)..",
+                    fontSize = 12.sp,
+                )
+            }
             if (dicePoints > 0) {
                 Row(
-                    //organizacion horizontal
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = messageDiceThrowing,
@@ -209,36 +228,33 @@ fun Content(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 if (dicePoints <= 0) {
-                    Box(
+                    Text(
+                        fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .border(2.dp, Color.Black)
-                            .shadow(2.dp)
-                            .padding(30.dp)
-                            .width(50.dp)
-                            .height(20.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "GAME OVER",
-                            fontSize = 20.sp,
-                            modifier = Modifier.align(Alignment.Center),
-                            color = colorResource(id = R.color.game_over_text)
-                        )
-                    }
+                            .border(
+                                width = 2.dp,
+                                color = Color.Black,
+                            )
+                            .padding(50.dp)
+                        ,
+                        text = stringResource(R.string.game_over),
+                        color = colorResource(id = R.color.game_over_text)
+                    )
+//                    }
                 } else {
                     // Contenedor para centrar el box de diceThrowed
-                    Box(
+                    Row(
                         modifier = Modifier
                             .border(2.dp, Color.Black)
                             .shadow(2.dp)
-                            .padding(40.dp)
-                            .width(120.dp)
-                            .height(80.dp), contentAlignment = Alignment.Center
+                            .padding(60.dp)
+                            .width(50.dp),
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = "$diceThrowed",
                             fontSize = 30.sp,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -259,23 +275,22 @@ fun Content(modifier: Modifier = Modifier) {
                         onClick = {
                             dicePoints -= 3
                             buttonsEnabled = false
-                            messageDiceThrowing = "Lanzando dado..."
+                            messageDiceThrowing = messageStr1
                             Thread {
                                 Thread.sleep(1000L)
                                 nextdiceThrowed = dice.throwDice() //Se tira dado
-                                messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                                messageDiceThrowing = ""
                                 if (dicePoints <= 0) {
                                     dicePoints = 0
-                                    popupMessage = "Has gastado todos los puntos, has perdido"
+                                    popupMessage = noPointsMessage
                                     showPopup = true
                                 } else {
                                     //Se compara
                                     if (nextdiceThrowed == i) {
                                         dicePoints += 15
-                                        popupMessage =
-                                            "¡Has adivinado el número! Ganaste 15 puntos."
+                                        popupMessage = winGuessMessage
                                     } else {
-                                        popupMessage = "No lo adivinaste, perdiste 3 puntos."
+                                        popupMessage = lostGuessMessage
                                     }
                                     showPopup = true
                                 }
@@ -294,7 +309,9 @@ fun Content(modifier: Modifier = Modifier) {
                             .shadow(4.dp, CircleShape)
                             .border(1.dp, Color.White, CircleShape)
                     ) {
-                        Text(text = "$i", fontSize = 20.sp, modifier = Modifier.padding(2.dp))
+                        Text(text = "$i",
+                             fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                             modifier = Modifier.padding(2.dp))
                     }
                     Spacer(modifier = Modifier.width(5.dp))
                 }
@@ -310,23 +327,22 @@ fun Content(modifier: Modifier = Modifier) {
                         onClick = {
                             dicePoints -= 3
                             buttonsEnabled = false
-                            messageDiceThrowing = "Lanzando dado..."
+                            messageDiceThrowing = messageStr1
                             Thread {
                                 Thread.sleep(1000L)
                                 nextdiceThrowed = dice.throwDice() //Se tira dado
-                                messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                                messageDiceThrowing = ""
                                 if (dicePoints <= 0) {
                                     dicePoints = 0
-                                    popupMessage = "Has gastado todos los puntos, has perdido"
+                                    popupMessage = noPointsMessage
                                     showPopup = true
                                 } else {
                                     //Se compara
                                     if (nextdiceThrowed == i) {
                                         dicePoints += 15
-                                        popupMessage =
-                                            "¡Has adivinado el número! Ganaste 15 puntos."
+                                        popupMessage = winGuessMessage
                                     } else {
-                                        popupMessage = "No lo adivinaste, perdiste 3 puntos."
+                                        popupMessage = lostGuessMessage
                                     }
                                     showPopup = true
                                 }
@@ -345,7 +361,9 @@ fun Content(modifier: Modifier = Modifier) {
                             .shadow(4.dp, CircleShape)
                             .border(1.dp, Color.White, CircleShape)
                     ) {
-                        Text(text = "$i", fontSize = 20.sp, modifier = Modifier.padding(2.dp))
+                        Text(text = "$i",
+                             fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                             modifier = Modifier.padding(2.dp))
                     }
                     Spacer(modifier = Modifier.width(5.dp))
                 }
@@ -361,7 +379,7 @@ fun Content(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.Absolute.Center
             ) {
                 Text(
-                    text = "Será el siguiente número mayor o menor que $diceThrowed ?"
+                    text = stringResource(R.string.explication_compare, diceThrowed)
                 )
             } //FIN FILA
             Row(
@@ -375,22 +393,22 @@ fun Content(modifier: Modifier = Modifier) {
                     onClick = {
                         dicePoints -= 1
                         buttonsEnabled = false
-                        messageDiceThrowing = "Lanzando dado..."
+                        messageDiceThrowing = messageStr1
                         Thread {
                             Thread.sleep(1000L)
                             nextdiceThrowed = dice.throwDice() //Se tira dado
-                            messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                            messageDiceThrowing = ""
                             if (dicePoints <= 0) {
                                 dicePoints = 0
-                                popupMessage = "Has gastado todos los puntos, has perdido"
+                                popupMessage = noPointsMessage
                                 showPopup = true
                             } else {
                                 //Se compara
                                 if (nextdiceThrowed > diceThrowed) {
                                     dicePoints += 3
-                                    popupMessage = "¡Correcto! Has ganado 3 puntos."
+                                    popupMessage = winCompareMessage
                                 } else {
-                                    popupMessage = "Incorrecto, has perdido 1 punto."
+                                    popupMessage = lostCompareMessage
                                 }
                                 showPopup = true
                             }
@@ -410,7 +428,9 @@ fun Content(modifier: Modifier = Modifier) {
                         .border(1.dp, Color.White, CircleShape)
                 ) {
                     Text(
-                        text = "↑", fontSize = 20.sp, modifier = Modifier.padding(2.dp)
+                        text = "↑",
+                        fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                        modifier = Modifier.padding(2.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(15.dp))
@@ -418,22 +438,22 @@ fun Content(modifier: Modifier = Modifier) {
                     onClick = {
                         dicePoints -= 1
                         buttonsEnabled = false
-                        messageDiceThrowing = "Lanzando dado..."
+                        messageDiceThrowing = messageStr1
                         Thread {
                             Thread.sleep(1000L)
                             nextdiceThrowed = dice.throwDice() //Se tira dado
-                            messageDiceThrowing = "¡Salió $nextdiceThrowed!"
+                            messageDiceThrowing = ""
                             if (dicePoints <= 0) {
                                 dicePoints = 0
-                                popupMessage = "Has gastado todos los puntos, has perdido"
+                                popupMessage = noPointsMessage
                                 showPopup = true
                             }else{
                                 //Se compara
                                 if (nextdiceThrowed < diceThrowed) {
                                     dicePoints += 3
-                                    popupMessage = "¡Correcto! Has ganado 3 puntos."
+                                    popupMessage = winCompareMessage
                                 } else {
-                                    popupMessage = "Incorrecto, has perdido 1 punto."
+                                    popupMessage = lostCompareMessage
                                 }
                                 showPopup = true
                             }
@@ -453,7 +473,9 @@ fun Content(modifier: Modifier = Modifier) {
                         .border(1.dp, Color.White, CircleShape)
                 ) {
                     Text(
-                        text = "↓", fontSize = 20.sp, modifier = Modifier.padding(2.dp)
+                        text = "↓",
+                        fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                        modifier = Modifier.padding(2.dp)
                     )
                 }
             }
@@ -463,11 +485,11 @@ fun Content(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.Absolute.Center
             ) {
                 Text(
-                    text = "Mayor"
+                    text = stringResource(R.string.major)
                 )
                 Spacer(modifier = Modifier.width(25.dp))
                 Text(
-                    text = "Menor"
+                    text = stringResource(R.string.minor)
                 )
             }
             //FIN FILA JUEGO
@@ -486,11 +508,11 @@ fun Content(modifier: Modifier = Modifier) {
 
                         //LANZAMIENTO INICIAL DEL DADO
                         buttonsEnabled = false
-                        messageDiceThrowing = "Lanzando dado..."
+                        messageDiceThrowing = messageStr1
                         Thread {
                             Thread.sleep(1000L)  // 1 segundo
                             diceThrowed = dice.throwDice() // método de la clase Dice
-                            messageDiceThrowing = "¡Salió $diceThrowed!"
+                            messageDiceThrowing = ""
                             buttonsEnabled = true
                         }.start()
                     },
@@ -504,7 +526,9 @@ fun Content(modifier: Modifier = Modifier) {
                         .border(1.dp, Color.White, CircleShape)
                 ) {
                     Text(
-                        text = "COMENZAR JUEGO", fontSize = 20.sp, modifier = Modifier.padding(2.dp)
+                        text = stringResource(R.string.start_game),
+                        fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                        modifier = Modifier.padding(2.dp)
                     )
                 }
             }
@@ -520,14 +544,15 @@ fun Content(modifier: Modifier = Modifier) {
 
         ) {
             Text(
-                text = "Ángela", fontSize = 15.sp
+                text = "Ángela",
+                fontSize = dimensionResource(id = R.dimen.fontsize_small).value.sp
             )
         } //FIN FILA NOMBRE
 
         //Configuración pop-up
         if (showPopup) {
             AlertDialog(onDismissRequest = { showPopup = false }, // Ocultar el pop-up al cerrarlo
-                        title = { Text(text = "Resultado Dado") },
+                        title = { Text(text = "Resultado") },
                         text = { Text(text = popupMessage) },
                         confirmButton = {
                             Button(onClick = { showPopup = false }) { Text("OK") }

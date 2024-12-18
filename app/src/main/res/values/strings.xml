@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">DiceGameAngela</string>
+    <string name="app_name" translatable="false">DiceGameAngela</string>
+    <string name="tittle_game" translatable="false">Dice Game</string>
+    <string name="description_game">Deberás predecir el numero aleatorio que va a salir. Ya sea directamente (1–6) o guiandote por el número que salió en el dado (↑ o ↓) .</string>
+    <string name="reset_game">VOLVER A EMPEZAR</string>
+    <string name="throwing_message">Lanzando dado…</string>
+    <string name="game_over">GAME OVER</string>
+    <string name="no_points_message">Has gastado todos los puntos, has perdido</string>
+    <string name="win_guess_message">¡Has adivinado el número! Ganaste 15 puntos.</string>
+    <string name="lost_guess_message">No lo adivinaste, perdiste 3 puntos.</string>
+    <string name="win_compare_message">¡Correcto! Has ganado 3 puntos.</string>
+    <string name="lost_compare_message">Incorrecto, has perdido 1 punto.</string>
+    <string name="explication_compare">Será el siguiente número mayor o menor que %1$s ?</string>
+    <string name="major">Mayor</string>
+    <string name="minor">Menor</string>
+    <string name="start_game">COMENZAR JUEGO</string>
 </resources>

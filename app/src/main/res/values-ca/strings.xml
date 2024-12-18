@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="description_game">Hauràs de predir el número aleatori que sortirà. Ja sigui directament (1–6) o guiant-te pel número que ha sortit al dau (↑ o ↓).</string>
+    <string name="reset_game">TORNAR A COMENÇAR</string>
+    <string name="throwing_message">Llançant dau…</string>
+    <string name="game_over">FI DEL JOC</string>
+    <string name="no_points_message">Has gastat tots els punts, has perdut.</string>
+    <string name="win_guess_message">Has encertat el número! Has guanyat 15 punts.</string>
+    <string name="lost_guess_message">No l\'has encertat, has perdut 3 punts.</string>
+    <string name="win_compare_message">Correcte! Has guanyat 3 punts.</string>
+    <string name="lost_compare_message">Incorrecte, has perdut 1 punt.</string>
+    <string name="explication_compare">Serà el següent més gran o més petit que %1$s?</string>
+    <string name="major">Més gran</string>
+    <string name="minor">Més petit</string>
+    <string name="start_game">COMENÇAR JOC</string>
+</resources>
