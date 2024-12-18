@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -57,39 +56,36 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Content(modifier: Modifier = Modifier) {
-
-    // Saveable - para que cuando cambie configuración no se cambie
-    var dicePoints by rememberSaveable { mutableIntStateOf(20) }
+    var dicePoints by rememberSaveable { mutableIntStateOf(2) }
     var startGame by rememberSaveable { mutableStateOf(false) }
 
-    //tiradas (la ultima (comparar) y la actual)
+    //mensaje que informa al usuario si pierde o gana puntos (con un boolean que los va cambiando)
+    var messageDice by rememberSaveable { mutableStateOf("") }
+    var showMessage by rememberSaveable { mutableStateOf(false) }
+
+    //tiradas siguiente (comparar) y la actual)
     var diceThrowed by rememberSaveable { mutableIntStateOf(0) }
     var nextdiceThrowed by rememberSaveable { mutableIntStateOf(0) }
 
-
     //Mensaje que se cambiará para simular lanzamiento de dado
+    // Lo hize asi para que sean reutilizables
     val messageStr1 = stringResource(R.string.throwing_message)
-    var messageDiceThrowing by rememberSaveable {mutableStateOf(messageStr1) }
+    var messageDiceThrowing by rememberSaveable { mutableStateOf(messageStr1) }
     val noPointsMessage = stringResource(R.string.no_points_message)
     val winGuessMessage = stringResource(R.string.win_guess_message)
     val lostGuessMessage = stringResource(R.string.lost_guess_message)
     val winCompareMessage = stringResource(R.string.win_compare_message)
     val lostCompareMessage = stringResource(R.string.lost_compare_message)
 
-    var buttonsEnabled by rememberSaveable { mutableStateOf(true) } //para la espera del lanzamiento
+    //Activador/Desactivador botones
+    var buttonsEnabled by rememberSaveable { mutableStateOf(true) }
 
-    // Pop-ups para informar al jugador si pierde o gana puntos
-    var showPopup by rememberSaveable { mutableStateOf(false) }
-    var popupMessage by rememberSaveable { mutableStateOf("") }
-
-    //Colores (xml)
+    //Colores (xml) - en variables para reutilizarlos
     val colorButtons = colorResource(id = R.color.color_buttons)
     val colorButtons2 = colorResource(id = R.color.color_buttons2)
-
     val colorButtonsDisabled = colorResource(id = R.color.color_buttons_disabled)
     val colorTxt1 = colorResource(id = R.color.default_text) //Negro
     val colorTxt2 = colorResource(id = R.color.default_text2) //Blanco
-
     val gradientColors = Brush.verticalGradient(
         colors = listOf(
             colorResource(id = R.color.gradient_start), colorResource(id = R.color.gradient_end)
@@ -115,7 +111,7 @@ fun Content(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = stringResource(R.string.tittle_game),
-                fontSize =  dimensionResource(id = R.dimen.fontsize_big).value.sp,
+                fontSize = dimensionResource(id = R.dimen.fontsize_big).value.sp,
                 color = colorTxt1
             )
         }
@@ -126,12 +122,10 @@ fun Content(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .padding(10.dp)
                 .border(1.dp, Color.Black)
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Absolute.Center
+                .padding(8.dp), horizontalArrangement = Arrangement.Absolute.Center
         ) {
             Text(
-                text = stringResource(R.string.description_game),
-                fontSize = 15.sp
+                text = stringResource(R.string.description_game), fontSize = 15.sp
             )
         } //FIN FILA DESCRIPCIÓN
 
@@ -159,6 +153,7 @@ fun Content(modifier: Modifier = Modifier) {
                                     dicePoints = 20
                                     diceThrowed = 0
                                     dice.reset() // uso objeto dice para resetear dado
+                                    messageDice = ""
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = colorResource(id = R.color.button_restartstart_background),
@@ -202,8 +197,7 @@ fun Content(modifier: Modifier = Modifier) {
             //FILA DADO
             if (dicePoints > 0) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = messageDiceThrowing,
@@ -226,12 +220,10 @@ fun Content(modifier: Modifier = Modifier) {
                                 width = 2.dp,
                                 color = Color.Black,
                             )
-                            .padding(50.dp)
-                        ,
+                            .padding(50.dp),
                         text = stringResource(R.string.game_over),
                         color = colorResource(id = R.color.game_over_text)
                     )
-//                    }
                 } else {
                     // Contenedor para centrar el box de diceThrowed
                     Row(
@@ -239,94 +231,161 @@ fun Content(modifier: Modifier = Modifier) {
                             .border(2.dp, Color.Black)
                             .shadow(2.dp)
                             .padding(60.dp)
-                            .width(50.dp),
-                        horizontalArrangement = Arrangement.Center
+                            .width(50.dp), horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "$diceThrowed",
-                            fontSize = 30.sp,
-                            textAlign = TextAlign.Center
+                            text = "$diceThrowed", fontSize = 30.sp, textAlign = TextAlign.Center
                         )
                     }
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ){
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+            ) {
                 Text(
-                    text= "Aqui irán los mensajes del dado.",
+                    text = messageDice,
                     fontSize = dimensionResource(id = R.dimen.fontsize_small).value.sp,
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
 
-            //FILA - BOTONES NUMEROS DEL 1 AL 6
-            Row(
-                //organizacion horizontal
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                horizontalArrangement = Arrangement.Absolute.Center
-            ) {
-                //He hecho bucles para las 2 filas para ahorrar codigo
-                for (i in 1..4) {
-                    Button(
-                        onClick = {
-                            dicePoints -= 3
-                            buttonsEnabled = false
-                            messageDiceThrowing = messageStr1
-                            Thread {
-                                Thread.sleep(1000L)
-                                nextdiceThrowed = dice.throwDice() //Se tira dado
-                                messageDiceThrowing = ""
-                                if (dicePoints <= 0) {
-                                    dicePoints = 0
-                                    popupMessage = noPointsMessage
-                                    showPopup = true
-                                } else {
-                                    //Se compara
-                                    if (nextdiceThrowed == i) {
-                                        dicePoints += 15
-                                        popupMessage = winGuessMessage
+            if (dicePoints > 0) {
+                //FILA - BOTONES NUMEROS DEL 1 AL 6
+                Row(
+                    //organizacion horizontal
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
+                    horizontalArrangement = Arrangement.Absolute.Center
+                ) {
+                    //He hecho bucles para las 2 filas para ahorrar codigo
+                    for (i in 1..4) {
+                        Button(
+                            onClick = {
+                                dicePoints -= 3
+                                buttonsEnabled = false
+                                messageDiceThrowing = messageStr1
+                                Thread {
+                                    Thread.sleep(1000L)
+                                    nextdiceThrowed = dice.throwDice() //Se tira dado
+                                    messageDiceThrowing = ""
+                                    if (dicePoints <= 0) {
+                                        dicePoints = 0
+                                        messageDice = noPointsMessage
+                                        showMessage = true
                                     } else {
-                                        popupMessage = lostGuessMessage
+                                        //Se compara
+                                        if (nextdiceThrowed == i) {
+                                            dicePoints += 15
+                                            messageDice = winGuessMessage
+                                        } else {
+                                            messageDice = lostGuessMessage
+                                        }
+                                        showMessage = true
                                     }
-                                    showPopup = true
-                                }
-                                buttonsEnabled = true
-                                diceThrowed = nextdiceThrowed //Lo vemos
-                            }.start()
-                        },
-                        enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = colorButtons,
-                            contentColor = colorTxt2,
-                            disabledContainerColor = colorButtonsDisabled,
-                        ),
-                        shape = CircleShape,
-                        modifier = Modifier
-                            .shadow(4.dp, CircleShape)
-                            .border(1.dp, Color.White, CircleShape)
-                    ) {
-                        Text(text = "$i",
-                             fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
-                             modifier = Modifier.padding(2.dp))
+                                    buttonsEnabled = true
+                                    diceThrowed = nextdiceThrowed //Lo vemos
+                                }.start()
+                            },
+                            enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorButtons,
+                                contentColor = colorTxt2,
+                                disabledContainerColor = colorButtonsDisabled,
+                            ),
+                            shape = CircleShape,
+                            modifier = Modifier
+                                .shadow(4.dp, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                        ) {
+                            Text(
+                                text = "$i",
+                                fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                                modifier = Modifier.padding(2.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(5.dp))
                     }
-                    Spacer(modifier = Modifier.width(5.dp))
                 }
-            }
-            //FIN FILA
-            Row(
-                //organizacion horizontal
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Absolute.Center
-            ) {
-                for (i in 5..6) {
+                //FIN FILA
+                Row(
+                    //organizacion horizontal
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Absolute.Center
+                ) {
+                    for (i in 5..6) {
+                        Button(
+                            onClick = {
+                                dicePoints -= 3
+                                buttonsEnabled = false
+                                messageDiceThrowing = messageStr1
+                                Thread {
+                                    Thread.sleep(1000L)
+                                    nextdiceThrowed = dice.throwDice() //Se tira dado
+                                    messageDiceThrowing = ""
+                                    if (dicePoints <= 0) {
+                                        dicePoints = 0
+                                        messageDice = noPointsMessage
+                                        showMessage = true
+                                    } else {
+                                        //Se compara
+                                        if (nextdiceThrowed == i) {
+                                            dicePoints += 15
+                                            messageDice = winGuessMessage
+                                        } else {
+                                            messageDice = lostGuessMessage
+                                        }
+                                        showMessage = true
+                                    }
+                                    buttonsEnabled = true
+                                    diceThrowed = nextdiceThrowed //Lo vemos
+                                }.start()
+                            },
+                            enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorButtons,
+                                contentColor = colorTxt2,
+                                disabledContainerColor = colorButtonsDisabled
+                            ),
+                            shape = CircleShape,
+                            modifier = Modifier
+                                .shadow(4.dp, CircleShape)
+                                .border(1.dp, Color.White, CircleShape)
+                        ) {
+                            Text(
+                                text = "$i",
+                                fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                                modifier = Modifier.padding(2.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(5.dp))
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+
+                //FILA - BOTONES MAYOR Y MENOR
+                Row(
+                    //organizacion horizontal
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    horizontalArrangement = Arrangement.Absolute.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.explication_compare, diceThrowed)
+                    )
+                } //FIN FILA
+                Row(
+                    //organizacion horizontal
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
+                    horizontalArrangement = Arrangement.Absolute.Center
+                ) {
                     Button(
                         onClick = {
-                            dicePoints -= 3
+                            dicePoints -= 1
                             buttonsEnabled = false
                             messageDiceThrowing = messageStr1
                             Thread {
@@ -335,17 +394,17 @@ fun Content(modifier: Modifier = Modifier) {
                                 messageDiceThrowing = ""
                                 if (dicePoints <= 0) {
                                     dicePoints = 0
-                                    popupMessage = noPointsMessage
-                                    showPopup = true
+                                    messageDice = noPointsMessage
+                                    showMessage = true
                                 } else {
                                     //Se compara
-                                    if (nextdiceThrowed == i) {
-                                        dicePoints += 15
-                                        popupMessage = winGuessMessage
+                                    if (nextdiceThrowed > diceThrowed) {
+                                        dicePoints += 3
+                                        messageDice = winCompareMessage
                                     } else {
-                                        popupMessage = lostGuessMessage
+                                        messageDice = lostCompareMessage
                                     }
-                                    showPopup = true
+                                    showMessage = true
                                 }
                                 buttonsEnabled = true
                                 diceThrowed = nextdiceThrowed //Lo vemos
@@ -353,145 +412,80 @@ fun Content(modifier: Modifier = Modifier) {
                         },
                         enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = colorButtons,
+                            containerColor = colorButtons2,
                             contentColor = colorTxt2,
                             disabledContainerColor = colorButtonsDisabled
                         ),
                         shape = CircleShape,
                         modifier = Modifier
-                            .shadow(4.dp, CircleShape)
+                            .shadow(8.dp, CircleShape)
                             .border(1.dp, Color.White, CircleShape)
                     ) {
-                        Text(text = "$i",
-                             fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
-                             modifier = Modifier.padding(2.dp))
+                        Text(
+                            text = "↑",
+                            fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                            modifier = Modifier.padding(2.dp)
+                        )
                     }
-                    Spacer(modifier = Modifier.width(5.dp))
-                }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-
-            //FILA - BOTONES MAYOR Y MENOR
-            Row(
-                //organizacion horizontal
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                horizontalArrangement = Arrangement.Absolute.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.explication_compare, diceThrowed)
-                )
-            } //FIN FILA
-            Row(
-                //organizacion horizontal
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                horizontalArrangement = Arrangement.Absolute.Center
-            ) {
-                Button(
-                    onClick = {
-                        dicePoints -= 1
-                        buttonsEnabled = false
-                        messageDiceThrowing = messageStr1
-                        Thread {
-                            Thread.sleep(1000L)
-                            nextdiceThrowed = dice.throwDice() //Se tira dado
-                            messageDiceThrowing = ""
-                            if (dicePoints <= 0) {
-                                dicePoints = 0
-                                popupMessage = noPointsMessage
-                                showPopup = true
-                            } else {
-                                //Se compara
-                                if (nextdiceThrowed > diceThrowed) {
-                                    dicePoints += 3
-                                    popupMessage = winCompareMessage
+                    Spacer(modifier = Modifier.width(15.dp))
+                    Button(
+                        onClick = {
+                            dicePoints -= 1
+                            buttonsEnabled = false
+                            messageDiceThrowing = messageStr1
+                            Thread {
+                                Thread.sleep(1000L)
+                                nextdiceThrowed = dice.throwDice() //Se tira dado
+                                messageDiceThrowing = ""
+                                if (dicePoints <= 0) {
+                                    dicePoints = 0
+                                    messageDice = noPointsMessage
+                                    showMessage = true
                                 } else {
-                                    popupMessage = lostCompareMessage
+                                    //Se compara
+                                    if (nextdiceThrowed < diceThrowed) {
+                                        dicePoints += 3
+                                        messageDice = winCompareMessage
+                                    } else {
+                                        messageDice = lostCompareMessage
+                                    }
+                                    showMessage = true
                                 }
-                                showPopup = true
-                            }
-                            buttonsEnabled = true
-                            diceThrowed = nextdiceThrowed //Lo vemos
-                        }.start()
-                    },
-                    enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorButtons2,
-                        contentColor = colorTxt2,
-                        disabledContainerColor = colorButtonsDisabled
-                    ),
-                    shape = CircleShape,
-                    modifier = Modifier
-                        .shadow(8.dp, CircleShape)
-                        .border(1.dp, Color.White, CircleShape)
+                                buttonsEnabled = true
+                                diceThrowed = nextdiceThrowed //Lo vemos
+                            }.start()
+                        },
+                        enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorButtons2,
+                            contentColor = colorTxt2,
+                            disabledContainerColor = colorButtonsDisabled
+                        ),
+                        shape = CircleShape,
+                        modifier = Modifier
+                            .shadow(8.dp, CircleShape)
+                            .border(1.dp, Color.White, CircleShape)
+                    ) {
+                        Text(
+                            text = "↓",
+                            fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
+                            modifier = Modifier.padding(2.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Absolute.Center
                 ) {
                     Text(
-                        text = "↑",
-                        fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
-                        modifier = Modifier.padding(2.dp)
+                        text = stringResource(R.string.major)
                     )
-                }
-                Spacer(modifier = Modifier.width(15.dp))
-                Button(
-                    onClick = {
-                        dicePoints -= 1
-                        buttonsEnabled = false
-                        messageDiceThrowing = messageStr1
-                        Thread {
-                            Thread.sleep(1000L)
-                            nextdiceThrowed = dice.throwDice() //Se tira dado
-                            messageDiceThrowing = ""
-                            if (dicePoints <= 0) {
-                                dicePoints = 0
-                                popupMessage = noPointsMessage
-                                showPopup = true
-                            }else{
-                                //Se compara
-                                if (nextdiceThrowed < diceThrowed) {
-                                    dicePoints += 3
-                                    popupMessage = winCompareMessage
-                                } else {
-                                    popupMessage = lostCompareMessage
-                                }
-                                showPopup = true
-                            }
-                            buttonsEnabled = true
-                            diceThrowed = nextdiceThrowed //Lo vemos
-                        }.start()
-                    },
-                    enabled = dicePoints > 0 && buttonsEnabled, //habilitación boton (mas de 0 puntos y tiempo espera)
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorButtons2,
-                        contentColor = colorTxt2,
-                        disabledContainerColor = colorButtonsDisabled
-                    ),
-                    shape = CircleShape,
-                    modifier = Modifier
-                        .shadow(8.dp, CircleShape)
-                        .border(1.dp, Color.White, CircleShape)
-                ) {
+                    Spacer(modifier = Modifier.width(25.dp))
                     Text(
-                        text = "↓",
-                        fontSize = dimensionResource(id = R.dimen.fontsize_medium).value.sp,
-                        modifier = Modifier.padding(2.dp)
+                        text = stringResource(R.string.minor)
                     )
                 }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Absolute.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.major)
-                )
-                Spacer(modifier = Modifier.width(25.dp))
-                Text(
-                    text = stringResource(R.string.minor)
-                )
             }
             //FIN FILA JUEGO
         } else {
@@ -514,12 +508,12 @@ fun Content(modifier: Modifier = Modifier) {
                             Thread.sleep(1000L)  // 1 segundo
                             diceThrowed = dice.throwDice() // método de la clase Dice
                             messageDiceThrowing = ""
+                            messageDice = ""
                             buttonsEnabled = true
                         }.start()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colorButtons2,
-                        contentColor = colorTxt2
+                        containerColor = colorButtons2, contentColor = colorTxt2
                     ),
                     shape = CircleShape,
                     modifier = Modifier
@@ -545,19 +539,8 @@ fun Content(modifier: Modifier = Modifier) {
 
         ) {
             Text(
-                text = "Ángela",
-                fontSize = dimensionResource(id = R.dimen.fontsize_small).value.sp
+                text = "Ángela", fontSize = dimensionResource(id = R.dimen.fontsize_small).value.sp
             )
         } //FIN FILA NOMBRE
-
-        //Configuración pop-up
-        if (showPopup) {
-            AlertDialog(onDismissRequest = { showPopup = false }, // Ocultar el pop-up al cerrarlo
-                        title = { Text(text = "Resultado") },
-                        text = { Text(text = popupMessage) },
-                        confirmButton = {
-                            Button(onClick = { showPopup = false }) { Text("OK") }
-                        })
-        }
     }
 }
